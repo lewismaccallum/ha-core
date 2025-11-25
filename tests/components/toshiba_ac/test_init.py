@@ -1,15 +1,12 @@
 """Test the Toshiba AC init."""
 
-from unittest.mock import AsyncMock, patch
-
-import pytest
+from unittest.mock import patch
 
 from homeassistant.components.toshiba_ac.api import (
     ToshibaAcAuthError,
     ToshibaAcDevice,
     ToshibaAcState,
 )
-from homeassistant.components.toshiba_ac.const import DOMAIN
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.core import HomeAssistant
 
@@ -86,12 +83,8 @@ async def test_setup_entry_auth_error(
         "homeassistant.components.toshiba_ac.ToshibaAcClient", autospec=True
     ) as mock_client_class:
         mock_client = mock_client_class.return_value
-        mock_client.async_get_devices.side_effect = ToshibaAcAuthError(
-            "Token expired"
-        )
-        mock_client.async_login.side_effect = ToshibaAcAuthError(
-            "Invalid credentials"
-        )
+        mock_client.async_get_devices.side_effect = ToshibaAcAuthError("Token expired")
+        mock_client.async_login.side_effect = ToshibaAcAuthError("Invalid credentials")
 
         mock_config_entry.add_to_hass(hass)
         await hass.config_entries.async_setup(mock_config_entry.entry_id)

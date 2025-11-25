@@ -20,7 +20,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .api import ToshibaAcDevice, ToshibaAcState
-from .const import DOMAIN, MAX_TEMP, MIN_TEMP
+from .const import MAX_TEMP, MIN_TEMP
 from .coordinator import ToshibaAcConfigEntry, ToshibaAcCoordinator
 from .entity import ToshibaAcEntity
 
@@ -82,8 +82,7 @@ async def async_setup_entry(
     coordinator = entry.runtime_data
 
     async_add_entities(
-        ToshibaAcClimate(coordinator, device)
-        for device in coordinator.devices.values()
+        ToshibaAcClimate(coordinator, device) for device in coordinator.devices.values()
     )
 
 

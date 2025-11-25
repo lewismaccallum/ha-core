@@ -61,11 +61,15 @@ def mock_setup_entry() -> Generator[AsyncMock]:
 @pytest.fixture
 def mock_toshiba_client() -> Generator[AsyncMock]:
     """Create a mock Toshiba AC API client."""
-    with patch(
-        "homeassistant.components.toshiba_ac.ToshibaAcClient", autospec=True
-    ) as mock_client_class, patch(
-        "homeassistant.components.toshiba_ac.config_flow.ToshibaAcClient", autospec=True
-    ) as mock_config_flow_client_class:
+    with (
+        patch(
+            "homeassistant.components.toshiba_ac.ToshibaAcClient", autospec=True
+        ) as mock_client_class,
+        patch(
+            "homeassistant.components.toshiba_ac.config_flow.ToshibaAcClient",
+            autospec=True,
+        ) as mock_config_flow_client_class,
+    ):
         mock_client = mock_client_class.return_value
         mock_config_flow_client = mock_config_flow_client_class.return_value
 

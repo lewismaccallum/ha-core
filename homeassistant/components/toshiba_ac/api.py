@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-import logging
 from dataclasses import dataclass
+import logging
 from typing import Any
 
 from aiohttp import ClientSession, ClientTimeout
@@ -30,9 +30,9 @@ from .const import (
     PAYLOAD_STATE_POS,
     PAYLOAD_SWING_POS,
     PAYLOAD_TEMP_POS,
-    POWER_100,
     POWER_50,
     POWER_75,
+    POWER_100,
     POWER_NONE,
     SELF_CLEAN_OFF,
     SELF_CLEAN_ON,
@@ -135,30 +135,28 @@ class ToshibaAcClient:
         }
 
         timeout = ClientTimeout(total=API_TIMEOUT)
+        status = 0
+        data: dict[str, Any] = {}
+
         try:
             async with self._session.post(
                 url, json=payload, timeout=timeout
             ) as response:
-                if response.status == 401:
-                    raise ToshibaAcAuthError("Invalid credentials")
-                if response.status != 200:
-                    raise ToshibaAcApiError(f"API error: {response.status}")
-
+                status = response.status
                 data = await response.json()
         except TimeoutError as err:
             raise ToshibaAcConnectionError("Connection timeout") from err
-        except ToshibaAcAuthError:
-            raise
-        except ToshibaAcApiError:
-            raise
         except Exception as err:
             raise ToshibaAcConnectionError(f"Connection error: {err}") from err
 
+        if status == 401:
+            raise ToshibaAcAuthError("Invalid credentials")
+        if status != 200:
+            raise ToshibaAcApiError(f"API error: {status}")
+
         if "ResObj" not in data or data["ResObj"] is None:
             if data.get("IsSuccess") is False:
-                raise ToshibaAcAuthError(
-                    data.get("Message", "Authentication failed")
-                )
+                raise ToshibaAcAuthError(data.get("Message", "Authentication failed"))
             raise ToshibaAcApiError("Invalid response from API")
 
         res_obj = data["ResObj"]
@@ -185,24 +183,24 @@ class ToshibaAcClient:
         headers = {"Authorization": f"Bearer {self._access_token}"}
 
         timeout = ClientTimeout(total=API_TIMEOUT)
+        status = 0
+        data: dict[str, Any] = {}
+
         try:
             async with self._session.get(
                 url, params=params, headers=headers, timeout=timeout
             ) as response:
-                if response.status == 401:
-                    raise ToshibaAcAuthError("Token expired or invalid")
-                if response.status != 200:
-                    raise ToshibaAcApiError(f"API error: {response.status}")
-
+                status = response.status
                 data = await response.json()
         except TimeoutError as err:
             raise ToshibaAcConnectionError("Connection timeout") from err
-        except ToshibaAcAuthError:
-            raise
-        except ToshibaAcApiError:
-            raise
         except Exception as err:
             raise ToshibaAcConnectionError(f"Connection error: {err}") from err
+
+        if status == 401:
+            raise ToshibaAcAuthError("Token expired or invalid")
+        if status != 200:
+            raise ToshibaAcApiError(f"API error: {status}")
 
         devices: list[ToshibaAcDevice] = []
         res_obj = data.get("ResObj", [])
@@ -241,33 +239,31 @@ class ToshibaAcClient:
         headers = {"Authorization": f"Bearer {self._access_token}"}
 
         timeout = ClientTimeout(total=API_TIMEOUT)
+        status = 0
+        data: dict[str, Any] = {}
+
         try:
             async with self._session.get(
                 url, params=params, headers=headers, timeout=timeout
             ) as response:
-                if response.status == 401:
-                    raise ToshibaAcAuthError("Token expired or invalid")
-                if response.status != 200:
-                    raise ToshibaAcApiError(f"API error: {response.status}")
-
+                status = response.status
                 data = await response.json()
         except TimeoutError as err:
             raise ToshibaAcConnectionError("Connection timeout") from err
-        except ToshibaAcAuthError:
-            raise
-        except ToshibaAcApiError:
-            raise
         except Exception as err:
             raise ToshibaAcConnectionError(f"Connection error: {err}") from err
+
+        if status == 401:
+            raise ToshibaAcAuthError("Token expired or invalid")
+        if status != 200:
+            raise ToshibaAcApiError(f"API error: {status}")
 
         res_obj = data.get("ResObj", {})
         if not res_obj:
             raise ToshibaAcApiError(f"No state data for device {ac_id}")
 
         # Get raw payload from response
-        raw_payload = res_obj.get("ACStateData") or res_obj.get(
-            "acStateData", ""
-        )
+        raw_payload = res_obj.get("ACStateData") or res_obj.get("acStateData", "")
 
         return self._parse_state(ac_id, raw_payload)
 

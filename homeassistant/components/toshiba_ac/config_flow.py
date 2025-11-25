@@ -11,11 +11,7 @@ from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.helpers import aiohttp_client
 
-from .api import (
-    ToshibaAcAuthError,
-    ToshibaAcClient,
-    ToshibaAcConnectionError,
-)
+from .api import ToshibaAcAuthError, ToshibaAcClient, ToshibaAcConnectionError
 from .const import (
     CONF_ACCESS_TOKEN,
     CONF_BRAND_ID,
@@ -101,9 +97,7 @@ class ToshibaAcConfigFlow(ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
-    async def async_step_reauth(
-        self, entry_data: dict[str, Any]
-    ) -> ConfigFlowResult:
+    async def async_step_reauth(self, entry_data: dict[str, Any]) -> ConfigFlowResult:
         """Handle reauthentication."""
         return await self.async_step_reauth_confirm()
 

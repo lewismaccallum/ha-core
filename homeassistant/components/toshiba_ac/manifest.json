@@ -6,5 +6,5 @@
   "documentation": "https://www.home-assistant.io/integrations/toshiba_ac",
   "integration_type": "hub",
   "iot_class": "cloud_polling",
-  "requirements": ["aiohttp>=3.8.0"]
+  "requirements": []
 }

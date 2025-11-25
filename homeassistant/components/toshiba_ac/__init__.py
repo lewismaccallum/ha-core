@@ -6,7 +6,12 @@ from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import aiohttp_client
 
-from .api import ToshibaAcClient
+from .api import (
+    ToshibaAcApiError,
+    ToshibaAcAuthError,
+    ToshibaAcClient,
+    ToshibaAcConnectionError,
+)
 from .const import (
     CONF_ACCESS_TOKEN,
     CONF_BRAND_ID,
@@ -33,7 +38,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ToshibaAcConfigEntry) ->
     # If tokens are expired, re-login
     try:
         await client.async_get_devices()
-    except Exception:  # noqa: BLE001
+    except (ToshibaAcAuthError, ToshibaAcConnectionError, ToshibaAcApiError):
         # Token may be expired, try to re-login
         await client.async_login(
             entry.data[CONF_USERNAME],
